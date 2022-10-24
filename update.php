@@ -41,8 +41,11 @@ curl_close($ch);
 if (isset($result['result'][0]['id'])) {
     define('CLOUDFLARE_ID', $result['result'][0]['id']);
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL,
-        'https://api.cloudflare.com/client/v4/zones/' . CLOUDFLARE_ID . '/dns_records?type=A&name=' . urlencode(CLOUDFLARE_RECORD));
+    curl_setopt(
+        $ch,
+        CURLOPT_URL,
+        'https://api.cloudflare.com/client/v4/zones/' . CLOUDFLARE_ID . '/dns_records?type=A&name=' . urlencode(CLOUDFLARE_RECORD)
+    );
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
     $headers = array();
@@ -55,30 +58,33 @@ if (isset($result['result'][0]['id'])) {
     if (isset($result['result'][0]['id'])) {
         define('CLOUDFLARE_RECORD_ID', $result['result'][0]['id']);
         $oldIp = $result['result'][0]['content'];
-            if (filter_var($ip, FILTER_VALIDATE_IP) and $ip !== $oldIp) {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL,
-                    'https://api.cloudflare.com/client/v4/zones/' . CLOUDFLARE_ID . '/dns_records/' . CLOUDFLARE_RECORD_ID);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array(
-                    'type' => 'A',
-                    'name' => CLOUDFLARE_RECORD,
-                    'content' => $ip,
-                    'proxied' => CLOUDFLARE_RECORD_PROXIED
-                )));
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-                $headers = array();
-                $headers[] = 'X-Auth-Email: ' . CLOUDFLARE_EMAIL;
-                $headers[] = 'X-Auth-Key: ' . CLOUDFLARE_API_KEY;
-                $headers[] = 'Content-Type: application/json';
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                $result = json_decode(curl_exec($ch), true);
-                curl_close($ch);
-                if ($result['success']) {
-                    echo "\nRecord updated.\nOld IP: $oldIp\nNew IP: $ip\n";
-                    $oldIp = $ip;
-                }
+        if (filter_var($ip, FILTER_VALIDATE_IP) and $ip !== $oldIp) {
+            $ch = curl_init();
+            curl_setopt(
+                $ch,
+                CURLOPT_URL,
+                'https://api.cloudflare.com/client/v4/zones/' . CLOUDFLARE_ID . '/dns_records/' . CLOUDFLARE_RECORD_ID
+            );
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array(
+                'type' => 'A',
+                'name' => CLOUDFLARE_RECORD,
+                'content' => $ip,
+                'proxied' => CLOUDFLARE_RECORD_PROXIED
+            )));
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+            $headers = array();
+            $headers[] = 'X-Auth-Email: ' . CLOUDFLARE_EMAIL;
+            $headers[] = 'X-Auth-Key: ' . CLOUDFLARE_API_KEY;
+            $headers[] = 'Content-Type: application/json';
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            $result = json_decode(curl_exec($ch), true);
+            curl_close($ch);
+            if ($result['success']) {
+                echo "\nRecord updated.\nOld IP: $oldIp\nNew IP: $ip\n";
+                $oldIp = $ip;
             }
+        }
     } else {
         die('Record not found.' . PHP_EOL);
     }
