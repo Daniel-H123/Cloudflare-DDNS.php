@@ -1,16 +1,32 @@
 <?php
 
-define('CLOUDFLARE_API_KEY', 'Your cloudflare api key');
+// Request url: https://website.com/update.php?email=example@email.com&token=VerySecureToken&domain=example.domain.com&ip=127.0.0.1
+
+// Get all GET information
+$targetDomain = $_GET["domain"];
+$ip = $_GET['ip'];
+$token = $_GET['token'];
+$email = $_GET['email'];
+
+// Extract domain if record domain is subdomain (example.domain.com => domail.com)
+// NOTE: This does not work on example.co.uk domains!
+$pattern = "/[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/";
+$matches = array();
+preg_match($pattern, $targetDomain, $matches);
+$domain = $matches[0];
+
+define('TOKEN', 'Your random password');
 define('CLOUDFLARE_EMAIL', 'Your cloudflare email');
-define('DOMAIN', 'example.com');
-define('CLOUDFLARE_RECORD', 'AArecord.example.com');
+define('CLOUDFLARE_API_KEY', 'Your cloudflare api key');
+define('DOMAIN', $domain);
+define('CLOUDFLARE_RECORD', $targetDomain);
 define('CLOUDFLARE_RECORD_PROXIED', true);
-define('CHECK_SECONDS', 120);
 
+// Validate token and email (higly recommended)
+if (TOKEN != $token || $email != CLOUDFLARE_EMAIL) {
+    die("Invalid authentication information!");
+}
 
-
-
-echo 'Cloudflare API Key: ' . CLOUDFLARE_API_KEY . PHP_EOL . 'Cloudflare email: ' . CLOUDFLARE_EMAIL . PHP_EOL . 'Domain: ' . DOMAIN . PHP_EOL . 'Record: ' . CLOUDFLARE_RECORD . PHP_EOL . 'Check every ' . CHECK_SECONDS . ' seconds.' . PHP_EOL . 'Status: ';
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'https://api.cloudflare.com/client/v4/zones?name=' . urlencode(DOMAIN));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -39,9 +55,6 @@ if (isset($result['result'][0]['id'])) {
     if (isset($result['result'][0]['id'])) {
         define('CLOUDFLARE_RECORD_ID', $result['result'][0]['id']);
         $oldIp = $result['result'][0]['content'];
-        echo 'Running' . PHP_EOL;
-        while (true) {
-            $ip = file_get_contents('https://ipv4.myip.info/');
             if (filter_var($ip, FILTER_VALIDATE_IP) and $ip !== $oldIp) {
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL,
@@ -66,8 +79,6 @@ if (isset($result['result'][0]['id'])) {
                     $oldIp = $ip;
                 }
             }
-            sleep(CHECK_SECONDS);
-        }
     } else {
         die('Record not found.' . PHP_EOL);
     }
