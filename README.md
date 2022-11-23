@@ -10,3 +10,11 @@ Change:
 Domains with multiple top level domains (like .co.uk) are currently not supported.
 
 Example request url: https://website.com/update.php?email=example@email.com&token=VerySecureToken&domain=example.domain.com&ip=127.0.0.1
+
+# Updated version of this API
+
+**Cloudflare-DynDNS-API**
+
+Github: https://github.com/Daniel-H123/Cloudflare-DynDNS-API
+
+Documentation: https://api.cloudflare-dyndns.com/documentation
