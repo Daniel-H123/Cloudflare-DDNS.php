@@ -46,4 +46,4 @@ Feel free to contribute to the improvement of this script by submitting pull req
 Use this script at your own risk. The script author and contributors are not responsible for any misuse or damage caused by its use.
 
 ## License
-This script is released under the MIT License. See the [LICENSE](https://github.com/Daniel-H123/Cloudflare-DDNS.php/tree/master?tab=MIT-1-ov-file) file for more details.
+This script is released under the MIT License. See the [LICENSE](https://github.com/Daniel-H123/Cloudflare-DDNS.php/blob/master/README.md) file for more details.
